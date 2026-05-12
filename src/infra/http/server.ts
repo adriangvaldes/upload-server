@@ -9,6 +9,8 @@ import {
   validatorCompiler,
 } from 'fastify-type-provider-zod'
 import { env } from '@/env'
+import { exportUploadsRoute } from './routes/export-uploads'
+import { getUploadsRoute } from './routes/get-uploads'
 import { uploadImageRoute } from './routes/upload-image'
 import { transformSwaggerSchema } from './transform-swagger-schema'
 
@@ -17,7 +19,7 @@ const server = fastify()
 server.setValidatorCompiler(validatorCompiler)
 server.setSerializerCompiler(serializerCompiler)
 
-server.setErrorHandler((error, request, reply) => {
+server.setErrorHandler((error, _request, reply) => {
   if (hasZodFastifySchemaValidationErrors(error)) {
     return reply.status(400).send({
       message: 'Validation error',
@@ -50,7 +52,9 @@ server.register(fastifySwaggerUi, {
 })
 
 server.register(uploadImageRoute)
+server.register(getUploadsRoute)
+server.register(exportUploadsRoute)
 
 server.listen({ port: env.PORT, host: 'localhost' }).then(() => {
-  console.log('Server is running on http://localhost:' + env.PORT)
+  console.log(`Server is running on http://localhost:${env.PORT}`)
 })
